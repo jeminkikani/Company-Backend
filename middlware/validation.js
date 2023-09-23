@@ -24,7 +24,7 @@ module.exports.validator = {
     .withMessage("Invalid email format"),
 
   PASSWORD: body("password")
-    .custom((value) => !/\s/.test(value))
+    .custom((value) => !/\s/.test(value)) 
     .withMessage("password Is Required")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 4 characters long"),

@@ -2,7 +2,14 @@ const { validator } = require("../middlware/validation");
 
 module.exports.validationConstant = function (method) {
   const checkMissingFields = (req, res, next) => {
-    const requiredFields = ["firstname","lastname","email","password","confirm_Password","role",];
+    const requiredFields = [
+      "firstname",
+      "lastname",
+      "email",
+      "password",
+      "confirm_Password",
+      "role",
+    ];
     const missingFields = requiredFields.filter(
       (field) => !req.body.hasOwnProperty(field)
     );
