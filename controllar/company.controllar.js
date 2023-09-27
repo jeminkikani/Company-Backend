@@ -4,15 +4,15 @@ const jwt = require("jsonwebtoken");
 
 exports.create_comapny = async (req, res) => {
   try {
-
-    const user = await User.findById(req.user._id);
+    console.log(req.user);
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.json({ msg: "user is not found...." });
     }
 
-    const { register_no, company_name, company_address, contact_no } = req.body;
+      const { register_no, company_name, company_address, contact_no } = req.body;
 
-    const isExistCompanyNo = await Company.findOne({ register_no });
+      const isExistCompanyNo = await Company.findOne({ register_no });
     if (isExistCompanyNo) {
       return res.json({
         sttus: "Fail",
@@ -30,10 +30,10 @@ exports.create_comapny = async (req, res) => {
     //  console.log(newCompany);
     await newCompany.save();
     
-    const userId = req.user._id;
+    const userId = req.user.id;
     await User.findByIdAndUpdate(userId, { company_id: newCompany._id });
 
-    res.status(200).json({
+    return res.status(200).json({
       ststus: "Success",
       msg: "company is created...",
     });

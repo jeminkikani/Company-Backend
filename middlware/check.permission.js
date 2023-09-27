@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const ispermission = require("../models/ispermission.model");
-const jwt = require("jsonwebtoken");
+
 
 const validRoutes = [
   "createGroup",
@@ -14,8 +14,9 @@ const validRoles = ["Admin", "SuperAdmin", "User"];
 
 const checkPermissionMiddleware = (action) => async (req, res, next) => {
   try {
-    // const role = req.user.role
-    const user = await User.findById(req.user._id);
+    const role = req.user.role
+    // console.log(role);
+    const user = await User.findById(req.user.id);
     // console.log(user);
 
     if (!validRoutes.includes(action)) {
@@ -40,6 +41,7 @@ const checkPermissionMiddleware = (action) => async (req, res, next) => {
         .status(403)
         .json({ error: "Permission denied for this company" });
     }
+    
 
     next();
   } catch (error) {

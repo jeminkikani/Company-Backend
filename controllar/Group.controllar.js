@@ -1,31 +1,47 @@
 const Group = require("../models/Group.model");
 const User = require("../models/user.model");
+const GroupUser = require('../models/groupUser.model')
 
 exports.createGroup = async (req, res) => {
   try {
     const { Name, description } = req.body;
-
-    const userId = req.user._id;
+    const userId = req.user.id;
+    // console.log(userId);
     if (!userId) {
       return res.json({ msg: "user is not found...." });
     }
-
+    // console.log(req.user);
     const userCompanyId = req.user.company_id;
+    console.log(userCompanyId);
+    if (!userCompanyId) {
+      return res
+        .status(400)
+        .json({ msg: "company is not create for this User..." });
+    }
 
     const isExistUser = await Group.findOne({ Name });
-
-    if (isExistUser)
+    if (isExistUser) {
       return res.status(400).json({ msg: "Group Name is already exists." });
+    }
 
-    const newUser = new Group({
+    const newGroup = new Group({
       Name,
       description,
       company_id: userCompanyId,
     });
 
-    await newUser.save(); // Save the new user to the database
+    // Store data in GroupUser collection
+    const groupUser = new GroupUser({
+      user_id: userId,
+      group_id: newGroup._id, 
+      groupUserRole: "groupAdmin", 
+    });
 
-    res.status(201).json({ newUser, msg: "New Group Added." });
+    await groupUser.save();  // Save the new groupUser to the database
+
+    await newGroup.save(); // Save the new group to the database
+
+    res.status(201).json({ newGroup, msg: "New Group Added." });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ msg: "Internal Server Error" });
@@ -36,17 +52,17 @@ exports.createGroup = async (req, res) => {
 exports.viewGroup = async (req, res) => {
   try {
     // console.log(req.user);
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.json({ msg: "user is not found...." });
     }
 
-    const group = await Group.findById(Group._id);
+    const group = await Group.findById({ company_id : user.company_id });  
     if (!group) {
       return res.json({ msg: "group id is not found...." });
     }
 
-    console.log(group);
+    // console.log(group);
     res.status(201).json({
       status: "Sucess",
       message: "user Fetch sucessfully",
@@ -65,7 +81,7 @@ exports.viewGroup = async (req, res) => {
 // update user
 exports.updateGroup = async (req, res) => {
   try {
-    const user = await Group.findById(req.user._id);
+    const user = await Group.findById(req.user.id);
     if (!user) {
       return res.json({ msg: "user is not found...." });
     }

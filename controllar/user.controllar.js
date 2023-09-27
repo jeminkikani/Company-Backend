@@ -36,6 +36,7 @@ exports.registerUser = async (req, res) => {
         email: newuser.email,
         password: newuser.password,
         role: newuser.role,
+        company_id: null,
       };
       // console.log(payload);
 
@@ -75,6 +76,7 @@ exports.loginuser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    // console.log(user);
     // console.log(email);
     // console.log(password);
 
@@ -106,8 +108,9 @@ exports.loginuser = async (req, res) => {
       email: user.email,
       password: user.password,
       role: user.role,
+      company_id: user.company_id,
     };
-
+    // console.log(payload);
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
       expiresIn: "20d",
     });
@@ -133,8 +136,8 @@ exports.loginuser = async (req, res) => {
 // get-user
 exports.getuser = async (req, res) => {
   try {
-    // console.log(req.user);
-    const user = await User.findById(req.user._id).select("-password");
+    // console.log('>>>>>>>>>>>>>>>>>>>>>>>>',req.user);
+    const user = await User.findById(req.user.id).select("-password");
     // console.log(user);
     if (!user) {
       return res.json({ msg: "user not found..." });

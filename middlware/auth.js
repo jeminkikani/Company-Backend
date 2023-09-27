@@ -17,7 +17,6 @@ const isveryfy = (actionRole) => async (req, res, next) => {
   jwt.verify(token, secrate, async (error, userId) => {
     try {
       const tokenData = await Token.findOne({ token, isActive: true });
-
       if (!tokenData && error) {
         return res.status(403).json({
           status: "Fail",
@@ -29,9 +28,10 @@ const isveryfy = (actionRole) => async (req, res, next) => {
       req.user = {
         ...userId,
         role: userId.role,
+        company_id: userId.company_id
       };
-      // console.log(req.user.role);
       // console.log(req.user);
+      // console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]',req.user)
 
       // console.log(req.user.role);
       if (req.user.role !== actionRole) {
