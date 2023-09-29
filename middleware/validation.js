@@ -6,7 +6,7 @@ module.exports.validator = {
     .isEmpty()
     .withMessage("no Space are allowed Firstname")
     .isAlpha()
-    .withMessage("must be chracter in firstname"),
+    .withMessage("must be character in firstname"),
 
   LASTNAME: body("lastname")
     .not()

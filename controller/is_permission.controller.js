@@ -1,5 +1,4 @@
-const ispermission = require("../models/ispermission.model");
-
+const ispermission = require("../models/is_permission.model");
 
 exports.permission = async (req, res) => {
   const roles = ["SuperAdmin", "Admin", "User"];
@@ -57,7 +56,7 @@ exports.permission = async (req, res) => {
     const result = await ispermission.insertMany(arr);
     // console.log(result);
     res.status(200).json({
-      status: "Sucess",
+      status: "success",
       msg: "Data inserted successfully",
       data: result,
     });

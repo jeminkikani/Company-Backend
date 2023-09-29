@@ -2,9 +2,9 @@ require("dotenv").config({ path: "./config/.env" });
 const User = require("../models/user.model");
 const Token = require('../models/token.model')
 const jwt = require("jsonwebtoken");
-const secrate = process.env.SECRET_KEY;
+const secret = process.env.SECRET_KEY;
 
-const isveryfy = (actionRole) => async (req, res, next) => {
+const IsVerify = (actionRole) => async (req, res, next) => {
   const auth = req.headers["authorization"];
   if (!auth) {
     return res.json(402).json({
@@ -14,21 +14,20 @@ const isveryfy = (actionRole) => async (req, res, next) => {
   }
 
   const token = auth.split(" ")[1];
-  jwt.verify(token, secrate, async (error, userId) => {
+  jwt.verify(token, secret, async (error, userId) => {
     try {
       const tokenData = await Token.findOne({ token, isActive: true });
       if (!tokenData && error) {
         return res.status(403).json({
           status: "Fail",
           message: "Token is expired",
-          
         });
       }
 
       req.user = {
         ...userId,
         role: userId.role,
-        company_id: userId.company_id
+        company_id: userId.company_id,
       };
       // console.log(req.user);
       // console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]',req.user)
@@ -41,7 +40,6 @@ const isveryfy = (actionRole) => async (req, res, next) => {
         });
       }
       next();
-      
     } catch (error) {
       return res.status(403).json({
         status: "Fail",
@@ -52,33 +50,4 @@ const isveryfy = (actionRole) => async (req, res, next) => {
 };
 
 
-module.exports = { isveryfy };
-
-/*// require("dotenv").config({ path: './config/.env' });
-const jwt = require('jsonwebtoken');
-
-const checkToken = async (req, res, next) => {
-  let token = req.headers["authorization"];
-  if(!token) {
-    return res.status(401).json({
-      status:"Fail",
-      message:"Authontication Fail"
-    })
-  }
-  let isToken = token.split(" ")[1];
-  jwt.verify(isToken,process.env.PRIVET_KEY,(error,userdata) => {
-    if(error) {
-      res.status(400).json({
-        status:"Fail",
-        message:"JWT Expired"
-      })
-    }
-    req.userdata = userdata;
-    next();
-  })
-};
-
-module.exports = {
-  checkToken
-};
- */
+module.exports = { IsVerify };

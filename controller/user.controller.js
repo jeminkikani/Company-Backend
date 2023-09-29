@@ -14,13 +14,15 @@ exports.registerUser = async (req, res) => {
     if (password === confirm_Password) {
       const user = await User.findOne({ email });
       if (user) {
-        return res.json({ msg: "User is already exist...." });
+        return res
+          .status(403)
+          .json({ status: "Fail", msg: "User is already exist...." });
       }
 
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password, salt);
 
-      const newuser = await User.create({
+      const newUser = await User.create({
         firstname,
         lastname,
         email,
@@ -30,12 +32,12 @@ exports.registerUser = async (req, res) => {
       });
 
       const payload = {
-        id: newuser._id,
-        firstname: newuser.firstname,
-        lastname: newuser.lastname,
-        email: newuser.email,
-        password: newuser.password,
-        role: newuser.role,
+        id: newUser._id,
+        firstname: newUser.firstname,
+        lastname: newUser.lastname,
+        email: newUser.email,
+        password: newUser.password,
+        role: newUser.role,
         company_id: null,
       };
       // console.log(payload);
@@ -45,29 +47,31 @@ exports.registerUser = async (req, res) => {
       });
 
       const newToken = new Token({
-        user_id: newuser._id,
+        user_id: newUser._id,
         token,
       });
 
       await newToken.save();
 
-      await newuser.save();
+      await newUser.save();
       res.status(201).json({
-        sttus: "Sucess",
-        message: "user created sucessfully",
-        data: newuser,
+        status: "success",
+        message: "user created successfully",
+        data: newUser,
         token: token,
       });
     } else {
       return res.status(400).json({
-        sttus: "Fail",
+        status: "Fail",
         message: "password and confirm_password is not match",
         //   data: error,
       });
     }
   } catch (error) {
     console.log(error);
-    res.json({ status: "Fail", message: "something wen wrong", data: error });
+    res
+      .status(404)
+      .json({ status: "Fail", message: "something wen wrong", data: error });
   }
 };
 
@@ -81,12 +85,14 @@ exports.loginuser = async (req, res) => {
     // console.log(password);
 
     if (!user) {
-      return res.json({ msg: "user not found..." });
+      return res.status(403).json({ status: "Fail", msg: "user not found..." });
     }
-    const ismatch = await bcrypt.compare(password, user.password);
-    // console.log(ismatch);
-    if (!ismatch) {
-      return res.json({ msg: "user password is incorrect...." });
+    const isMatch = await bcrypt.compare(password, user.password);
+    // console.log(isMatch);
+    if (!isMatch) {
+      return res
+        .status(403)
+        .json({ status: "Fail", msg: "user password is incorrect...." });
     }
 
     const existingToken = await Token.findOneAndUpdate(
@@ -95,7 +101,9 @@ exports.loginuser = async (req, res) => {
     );
 
     if (!existingToken) {
-      return res.json({
+      return res.
+      status(403)
+      .json({
         status: "Fail",
         message: "user Is Login",
       });
@@ -123,13 +131,15 @@ exports.loginuser = async (req, res) => {
     await newToken.save();
 
     res.status(201).json({
-      status: "Sucess",
+      status: "success",
       message: "user Is Login",
       data: newToken,
     });
   } catch (error) {
     console.log(error);
-    res.json({ sttus: "Fail", message: "something went wrong", data: error });
+    res
+      .status(404)
+      .json({ status: "Fail", message: "something went wrong", data: error });
   }
 };
 
@@ -140,11 +150,11 @@ exports.getuser = async (req, res) => {
     const user = await User.findById(req.user.id).select("-password");
     // console.log(user);
     if (!user) {
-      return res.json({ msg: "user not found..." });
+      return res.status(403).json({ msg: "user not found..." });
     }
     res.status(201).json({
-      status: "Sucess",
-      message: "user Fetch sucessfully",
+      status: "success",
+      message: "user Fetch successfully",
       data: user,
     });
   } catch (error) {
@@ -162,16 +172,18 @@ exports.getallUser = async (req, res) => {
   try {
     const users = await User.find();
     if (!users) {
-      return res.json({ msg: "users not found..." });
+      return res.status(403).json({ msg: "users not found..." });
     }
     res.status(200).json({
-      status: "Sucess",
-      message: "user Fetch sucessfully",
+      status: "success",
+      message: "user Fetch successfully",
       data: users,
     });
   } catch (error) {
     console.log(error);
-    res.json({ status: "Fail", message: "something wen wrong", data: error });
+    res
+      .status(404)
+      .json({ status: "Fail", message: "something wen wrong", data: error });
   }
 };
 
@@ -180,7 +192,9 @@ exports.updateuser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.json({ msg: "user is not found...." });
+      return res
+        .status(403)
+        .json({ status: "Fail", msg: "user is not found...." });
     }
     const updateuser = await User.findByIdAndUpdate(
       user._id,
@@ -191,11 +205,13 @@ exports.updateuser = async (req, res) => {
     res.status(200).json({
       status: "Success",
       data: updateuser,
-      msg: "update user Sucessfully..",
+      msg: "update user successfully..",
     });
   } catch (error) {
     console.log(error);
-    res.json({ sttus: "Fail", message: "something wen wrong", data: error });
+    res
+      .status(404)
+      .json({ status: "Fail", message: "something wen wrong", data: error });
   }
 };
 
@@ -203,13 +219,13 @@ exports.deleteUser = async (req, res) => {
   try {
     const user = User.findOneAndDelete({ user: User._id });
     if (!user) {
-      return res.json({ msg: "user not found..." });
+      return res.status(403).json({ msg: "user not found..." });
     }
     res
       .status(204)
-      .json({ status: "Success", data: {}, msg: "delete user Sucessfully.." });
+      .json({ status: "Success", data: {}, msg: "delete user successfully.." });
   } catch (error) {
     console.log(error);
-    res.json({ sttus: "Fail", message: "something wen wrong", data: error });
+    res.json({ status: "Fail", message: "something wen wrong", data: error });
   }
 };

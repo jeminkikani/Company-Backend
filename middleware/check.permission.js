@@ -1,6 +1,5 @@
 const User = require("../models/user.model");
-const ispermission = require("../models/ispermission.model");
-
+const ispermission = require("../models/is_permission.model");
 
 const validRoutes = [
   "createGroup",
@@ -14,7 +13,7 @@ const validRoles = ["Admin", "SuperAdmin", "User"];
 
 const checkPermissionMiddleware = (action) => async (req, res, next) => {
   try {
-    const role = req.user.role
+    const role = req.user.role;
     // console.log(role);
     const user = await User.findById(req.user.id);
     // console.log(user);
@@ -41,7 +40,6 @@ const checkPermissionMiddleware = (action) => async (req, res, next) => {
         .status(403)
         .json({ error: "Permission denied for this company" });
     }
-    
 
     next();
   } catch (error) {

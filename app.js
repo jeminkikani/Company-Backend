@@ -22,12 +22,12 @@ mongoose
   });
 
 //userRoutes
-const userRoutes = require("./Routes/uesr.Routes");
+const userRoutes = require("./Routes/user.Routes");
 app.use("/api/user", userRoutes);
 
 // companyRoutes
-const ispermissionRoutes = require("./Routes/ispermission.Routes");
-app.use("/api", ispermissionRoutes);
+const is_permissionRoutes = require("./Routes/is_permission.Routes");
+app.use("/api", is_permissionRoutes);
 
 // groupRoutes 
 const groupRoutes = require("./Routes/Group.Routes");
@@ -37,6 +37,9 @@ app.use('/api', groupRoutes)
 const companyRoutes = require("./Routes/company.Routes");
 app.use('/api', companyRoutes)
 
+// groupUserRoutes
+const groupUserRoutes = require("./Routes/groupUser.Routes");
+app.use('/api', groupUserRoutes)
 
 //server started...
 app.listen(port, () => console.log(`http://loacalhost:${port}`));
