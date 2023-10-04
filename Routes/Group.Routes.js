@@ -7,44 +7,43 @@ const {
   listGroup,
   alldata,
   fetchiddata,
-  joinGroup,
 } = require("../controller/Group.controller");
 const { IsVerify } = require("../middleware/auth");
 const checkPermissionMiddleware = require("../middleware/check.permission");
 const groupRoutes = express.Router();
 
 groupRoutes.post(
-  "/create-group",
+  "/creategroup",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   createGroup
 );
 
 groupRoutes.get(
-  "/view-group",
+  "/viewgroup",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   viewGroup
 );
 
 groupRoutes.post(
-  "/update-group",
+  "/updategroup/:id",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   updateGroup
 );
 
 groupRoutes.delete(
-  "/delete-group",
+  "/deletegroup/:id",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   deleteGroup
 );
 
-groupRoutes.get("/list-group", listGroup);
+groupRoutes.get("/listgroup", listGroup);
 
 groupRoutes.get(
-  "/all-data",
+  "/alldata",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   alldata

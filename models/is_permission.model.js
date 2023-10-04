@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const ispermissionSchema = mongoose.Schema(
   {
-    ispermission_id: {
-      type: String,
-      default: 1,
+    company_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
     },
     role: {
       type: String,

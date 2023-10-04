@@ -9,7 +9,7 @@ const IsVerify = (actionRole) => async (req, res, next) => {
   if (!auth) {
     return res.json(402).json({
       status: "Fail",
-      msg: "token is not provide",
+      message: "token is not provide",
     });
   }
 
@@ -24,15 +24,23 @@ const IsVerify = (actionRole) => async (req, res, next) => {
         });
       }
 
+      // Fetch additional user data including role and company_id
+      const user = await User.findById(userId.id);
+      if (!user) {
+        return res.status(404).json({
+          status: "Fail",
+          message: "User not found",
+        });
+      }
+
+      const { role, company_id } = user; // Assuming user has role and company_id properties
+
       req.user = {
         ...userId,
-        role: userId.role,
-        company_id: userId.company_id,
+        role,
+        company_id,
       };
-      // console.log(req.user);
-      // console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]',req.user)
 
-      // console.log(req.user.role);
       if (req.user.role !== actionRole) {
         return res.status(403).json({
           status: "Fail",

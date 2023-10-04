@@ -14,16 +14,13 @@ const validRoles = ["Admin", "SuperAdmin", "User"];
 const checkPermissionMiddleware = (action) => async (req, res, next) => {
   try {
     const role = req.user.role;
-    // console.log(role);
     const user = await User.findById(req.user.id);
-    // console.log(user);
 
     if (!validRoutes.includes(action)) {
       return res.status(403).json({ error: "Invalid route" });
     }
 
     if (!validRoles.includes(user.role)) {
-      // console.log(user.role);
       return res.status(403).json({ error: "Invalid role" });
     }
 
@@ -33,7 +30,6 @@ const checkPermissionMiddleware = (action) => async (req, res, next) => {
         route: action,
       },
     });
-    // console.log(checkispermission);
 
     if (!checkispermission) {
       return res

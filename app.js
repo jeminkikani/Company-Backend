@@ -15,7 +15,7 @@ app.use(morgan("dev"));
 mongoose
   .connect(mongoUrl)
   .then(() => {
-    console.log(`DB connected..`);
+    console.log(`DB connected`);
   })
   .catch((err) => {
     console.log(err);
@@ -29,13 +29,13 @@ app.use("/api/user", userRoutes);
 const is_permissionRoutes = require("./Routes/is_permission.Routes");
 app.use("/api", is_permissionRoutes);
 
-// groupRoutes 
-const groupRoutes = require("./Routes/Group.Routes");
-app.use('/api', groupRoutes)
-
 // companyRoutes
 const companyRoutes = require("./Routes/company.Routes");
 app.use('/api', companyRoutes)
+
+// groupRoutes 
+const groupRoutes = require("./Routes/Group.Routes");
+app.use('/api', groupRoutes)
 
 // groupUserRoutes
 const groupUserRoutes = require("./Routes/groupUser.Routes");

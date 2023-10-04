@@ -10,28 +10,28 @@ const {
 const companyRoutes = express.Router();
 
 companyRoutes.post(
-  "/create-company",
+  "/createcompany",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   create_company
 );
 
 companyRoutes.get(
-  "/view-company",
+  "/viewcompany",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   view_company
 );
 
 companyRoutes.put(
-  "/update-company",
+  "/updatecompany",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   update_company
 );
 
 companyRoutes.post(
-  "/join-company/:id",
+  "/joincompany/:id",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   JoinCompany

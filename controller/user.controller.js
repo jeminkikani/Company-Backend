@@ -8,15 +8,23 @@ exports.registerUser = async (req, res) => {
     const { firstname, lastname, email, password, confirm_Password, role } =
       req.body;
 
-    // console.log(password);
-    // console.log(confirm_Password);
-
+    // Check for spaces in the fields
+    if (
+      firstname.includes(" ") ||
+      lastname.includes(" ") ||
+      email.includes(" ")
+    ) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Spaces are not allowed in firstname, lastname, or email",
+      });
+    }
     if (password === confirm_Password) {
       const user = await User.findOne({ email });
       if (user) {
         return res
           .status(403)
-          .json({ status: "Fail", msg: "User is already exist...." });
+          .json({ status: "Fail", message: "User is already exist" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -40,7 +48,6 @@ exports.registerUser = async (req, res) => {
         role: newUser.role,
         company_id: null,
       };
-      // console.log(payload);
 
       const token = jwt.sign(payload, process.env.SECRET_KEY, {
         expiresIn: "20d",
@@ -64,7 +71,6 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({
         status: "Fail",
         message: "password and confirm_password is not match",
-        //   data: error,
       });
     }
   } catch (error) {
@@ -80,19 +86,17 @@ exports.loginuser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    // console.log(user);
-    // console.log(email);
-    // console.log(password);
 
     if (!user) {
-      return res.status(403).json({ status: "Fail", msg: "user not found..." });
+      return res
+        .status(403)
+        .json({ status: "Fail", message: "user not found" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
-    // console.log(isMatch);
     if (!isMatch) {
       return res
         .status(403)
-        .json({ status: "Fail", msg: "user password is incorrect...." });
+        .json({ status: "Fail", message: "user password is incorrect" });
     }
 
     const existingToken = await Token.findOneAndUpdate(
@@ -101,9 +105,7 @@ exports.loginuser = async (req, res) => {
     );
 
     if (!existingToken) {
-      return res.
-      status(403)
-      .json({
+      return res.status(403).json({
         status: "Fail",
         message: "user Is Login",
       });
@@ -118,9 +120,11 @@ exports.loginuser = async (req, res) => {
       role: user.role,
       company_id: user.company_id,
     };
-    // console.log(payload);
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
       expiresIn: "20d",
+    });
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_KEY, {
+      expiresIn: "25d",
     });
 
     const newToken = new Token({
@@ -134,6 +138,7 @@ exports.loginuser = async (req, res) => {
       status: "success",
       message: "user Is Login",
       data: newToken,
+      refreshToken: refreshToken,
     });
   } catch (error) {
     console.log(error);
@@ -143,14 +148,58 @@ exports.loginuser = async (req, res) => {
   }
 };
 
-// get-user
-exports.getuser = async (req, res) => {
+// refresh-token
+exports.refreshToken = async (req, res) => {
   try {
-    // console.log('>>>>>>>>>>>>>>>>>>>>>>>>',req.user);
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.json(402).json({
+        status: "Fail",
+        message: "token is not provide",
+      });
+    }
+    const decode = jwt.verify(refreshToken, process.env.REFRESH_KEY);
+
+    const user = await User.findById(decode.id);
+
+    const payload = {
+      id: user._id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      company_id: user.company_id,
+    };
+    const accessToken = jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: "2h",
+    });
+
+    const newToken = await Token.findOneAndUpdate(
+      { user_id: user._id },
+      { token: accessToken },
+      { new: true } // Return the updated document
+    );
+
+    res.status(201).json({
+      status: "success",
+      message: "accessToken successfully",
+      data: newToken,
+    });
+  } catch (error) {
+    return res.status(403).json({
+      status: "Fail",
+      message: "Token is error",
+    });
+  }
+};
+
+// get-user
+exports.user_info = async (req, res) => {
+  try {
     const user = await User.findById(req.user.id).select("-password");
-    // console.log(user);
     if (!user) {
-      return res.status(403).json({ msg: "user not found..." });
+      return res.status(403).json({ status: "Fail", message: "user not found" });
     }
     res.status(201).json({
       status: "success",
@@ -158,7 +207,6 @@ exports.getuser = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", error);
     res.status(404).json({
       status: "Fail",
       message: "something went wrong",
@@ -168,11 +216,11 @@ exports.getuser = async (req, res) => {
 };
 
 // get-all-user
-exports.getallUser = async (req, res) => {
+exports.listUser = async (req, res) => {
   try {
     const users = await User.find();
     if (!users) {
-      return res.status(403).json({ msg: "users not found..." });
+      return res.status(403).json({ message: "users not found" });
     }
     res.status(200).json({
       status: "success",
@@ -190,11 +238,11 @@ exports.getallUser = async (req, res) => {
 // update user
 exports.updateuser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res
         .status(403)
-        .json({ status: "Fail", msg: "user is not found...." });
+        .json({ status: "Fail", message: "user is not found" });
     }
     const updateuser = await User.findByIdAndUpdate(
       user._id,
@@ -205,7 +253,7 @@ exports.updateuser = async (req, res) => {
     res.status(200).json({
       status: "Success",
       data: updateuser,
-      msg: "update user successfully..",
+      message: "update user successfully",
     });
   } catch (error) {
     console.log(error);
@@ -217,15 +265,17 @@ exports.updateuser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const user = User.findOneAndDelete({ user: User._id });
-    if (!user) {
-      return res.status(403).json({ msg: "user not found..." });
+    const userId = req.user.id;
+    if (!userId) {
+      return res.status(403).json({ message: "user not found" });
     }
-    res
-      .status(204)
-      .json({ status: "Success", data: {}, msg: "delete user successfully.." });
+    const deleteUser = await User.findByIdAndDelete(userId);
+    res.status(200).json({
+      status: "Success",
+      // data: {},
+      message: "delete user successfully",
+    });
   } catch (error) {
-    console.log(error);
-    res.json({ status: "Fail", message: "something wen wrong", data: error });
+    res.json({ status: "Fail", data: error, message: "something went wrong" });
   }
 };

@@ -5,11 +5,12 @@ exports.joinGroup = async (req, res) => {
   try {
     const groupId = req.params.id; // Assuming groupId is provided in the URL parameters
     const userId = req.user.id;
-    console.log(groupId);
     // Check if the user and group exist
     const group = await Group.findById(groupId);
     if (!group) {
-      return res.status(404).json({ status: "Fail", msg: "Group not found" });
+      return res
+        .status(404)
+        .json({ status: "Fail", message: "Group not found" });
     }
 
     const existingMember = await GroupUser.findOne({
@@ -18,12 +19,10 @@ exports.joinGroup = async (req, res) => {
     });
 
     if (existingMember) {
-      return res
-        .status(400)
-        .json({
-          status: "Fail",
-          msg: "User is already a member of this group",
-        });
+      return res.status(400).json({
+        status: "Fail",
+        message: "User is already a member of this group",
+      });
     }
 
     // Create a new GroupUser record
@@ -37,8 +36,11 @@ exports.joinGroup = async (req, res) => {
 
     res
       .status(200)
-      .json({ status: "success", msg: "User joined the group successfully." });
+      .json({
+        status: "success",
+        message: "User joined the group successfully.",
+      });
   } catch (error) {
-    res.status(500).json({ status: "Fail", msg: "Internal Server Error" });
+    res.status(500).json({ status: "Fail", message: "Internal Server Error" });
   }
 };

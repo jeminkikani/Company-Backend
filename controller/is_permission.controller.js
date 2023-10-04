@@ -52,18 +52,16 @@ exports.permission = async (req, res) => {
   });
 
   try {
-    // console.log(arr);
     const result = await ispermission.insertMany(arr);
-    // console.log(result);
     res.status(200).json({
       status: "success",
-      msg: "Data inserted successfully",
+      message: "Data inserted successfully",
       data: result,
     });
   } catch (error) {
     res.status(500).json({
       status: "Fail",
-      msg: "Error inserting data into MongoDB",
+      message: "Error inserting data into MongoDB",
       data: {},
     });
   }
