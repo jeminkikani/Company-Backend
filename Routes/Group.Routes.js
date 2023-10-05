@@ -43,14 +43,14 @@ groupRoutes.delete(
 groupRoutes.get("/listgroup", listGroup);
 
 groupRoutes.get(
-  "/alldata",
+  "/userinformation",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   alldata
 );
 
 groupRoutes.get(
-  "/get-company-id/get-group/:id",
+  "/companyAndGroups",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   fetchiddata

@@ -16,9 +16,12 @@ module.exports.validationConstant = function (method) {
       return (req, res, next) => {
         const { error } = validateSchema.validate(req.body);
         if (error) {
+          const errorMessage = error.details
+            .map((err) => err.message.replace(/"/g, ""))
+            .join(", ");
           return res.status(400).json({
             status: "fail",
-            message: error.details[0].message,
+            message: errorMessage,
           });
         }
         next();
@@ -32,9 +35,12 @@ module.exports.validationConstant = function (method) {
         }).validate(req.body);
 
         if (error) {
+          const errorMessage = error.details
+            .map((err) => err.message.replace(/"/g, ""))
+            .join(", ");
           return res.status(400).json({
             status: "fail",
-            message: error.details[0].message,
+            message: errorMessage,
           });
         }
         next();
@@ -50,9 +56,12 @@ module.exports.validationConstant = function (method) {
 
         const { error } = validateSchemaUpdate.validate(req.body);
         if (error) {
+          const errorMessage = error.details
+            .map((err) => err.message.replace(/"/g, ""))
+            .join(", ");
           return res.status(400).json({
             status: "fail",
-            message: error.details[0].message,
+            message: errorMessage,
           });
         }
         next();

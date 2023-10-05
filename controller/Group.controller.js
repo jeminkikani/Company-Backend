@@ -1,7 +1,9 @@
 const Group = require("../models/Group.model");
 const User = require("../models/user.model");
+const Company = require("../models/company.model");
 const GroupUser = require("../models/groupUser.model");
 
+//ceategroup
 exports.createGroup = async (req, res) => {
   try {
     const { Name, description } = req.body;
@@ -17,16 +19,16 @@ exports.createGroup = async (req, res) => {
     if (!userCompanyId) {
       return res.status(400).json({
         status: "Fail",
-        message: "company is not create for this User",
+        message: "group is not create for this User",
       });
     }
 
     const isExistUser = await Group.findOne({ Name });
-    if (isExistUser) {
-      return res
-        .status(400)
-        .json({ status: "Fail", message: "Group Name is already exists." });
-    }
+    // if (isExistUser) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: "Fail", message: "Group Name is already exists." });
+    // }
 
     const newGroup = new Group({
       Name,
@@ -100,11 +102,21 @@ exports.updateGroup = async (req, res) => {
         message: "user is not found",
       });
     }
+
+    const { Name, ...updateData } = req.body;
+
     const updateGroup = await Group.findOneAndUpdate(
       { company_id: user.company_id },
-      { $set: { ...req.body } },
+      { $set: { ...updateData, Name } },
       { new: true }
     );
+
+    if (!updateGroup) {
+      return res
+        .status(404)
+        .json({ status: "Fail", message: "Group not found" });
+    }
+
     res.status(200).json({
       status: "Success",
       data: updateGroup,
@@ -127,11 +139,17 @@ exports.deleteGroup = async (req, res) => {
         .status(404)
         .json({ status: "Fail", message: "group is not found" });
     }
-    const user = await Group.findByIdAndDelete(groupid);
+    const isExistGroup = await Group.findOne({ groupid });
+    if (!isExistGroup) {
+      return res
+        .status(400)
+        .json({ status: "Fail", message: "Group is not exists." });
+    }
+    const group = await Group.findByIdAndDelete(groupid);
     res.status(404).json({
       status: "Success",
+      message: "delete group successfully",
       data: {},
-      message: "delete user successfully",
     });
   } catch (error) {
     console.log(error);
@@ -229,10 +247,8 @@ exports.alldata = async (req, res) => {
     res.status(200).json({
       status: "Success",
       message: "Company data fetched successfully",
-      data: {
         userInformation,
         groupedData,
-      },
     });
   } catch (error) {
     console.error("Error:", error);
@@ -243,16 +259,27 @@ exports.alldata = async (req, res) => {
     });
   }
 };
-// using companyid fetch group data
+
+// using companyid fetch group data  
 exports.fetchiddata = async (req, res) => {
   try {
-    const companyId = req.params.id; // Fetching company ID from URL parameters
+    // Assuming the company ID is stored in the token
+    const companyId = req.user.company_id;
 
     if (!companyId) {
       return res.status(400).json({
         status: "Fail",
-        message: "Company ID not provided in URL",
-        data: null,
+        message: "Company ID not provided in the token",
+      });
+    }
+
+    // Fetch the company details based on the provided company_id
+    const company = await Company.findById(companyId);
+
+    if (!company) {
+      return res.status(404).json({
+        status: "Fail",
+        message: "Company not found",
       });
     }
 
@@ -273,7 +300,8 @@ exports.fetchiddata = async (req, res) => {
     res.status(200).json({
       status: "Success",
       message: "Groups fetched successfully",
-      data: { group: groupsObject },
+      company,
+      group: groupsObject,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -284,6 +312,8 @@ exports.fetchiddata = async (req, res) => {
     });
   }
 };
+
+
 
 // exports.alldata = async (req, res) => {
 //   try {

@@ -10,10 +10,11 @@ const groupUserSchemas = mongoose.Schema(
     group_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
+      require: true,
     },
     groupUserRole: {
       type: String,
-      default: 'groupAdmin',
+      default: "groupAdmin",
     },
   },
   { timestamps: true }

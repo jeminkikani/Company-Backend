@@ -189,7 +189,7 @@ exports.refreshToken = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       status: "Fail",
-      message: "Token is error",
+      message: "Token is Invalid",
     });
   }
 };
@@ -199,11 +199,13 @@ exports.user_info = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res.status(403).json({ status: "Fail", message: "user not found" });
+      return res
+        .status(403)
+        .json({ status: "Fail", message: "user not found" });
     }
     res.status(201).json({
       status: "success",
-      message: "user Fetch successfully",
+      message: "user Form successfully",
       data: user,
     });
   } catch (error) {
@@ -248,12 +250,12 @@ exports.updateuser = async (req, res) => {
       user._id,
       { $set: { ...req.body } },
       { new: true }
-    );
+    ).select("-password");
     updateuser.save();
     res.status(200).json({
       status: "Success",
-      data: updateuser,
       message: "update user successfully",
+      data: updateuser,
     });
   } catch (error) {
     console.log(error);
@@ -267,7 +269,9 @@ exports.deleteUser = async (req, res) => {
   try {
     const userId = req.user.id;
     if (!userId) {
-      return res.status(403).json({ message: "user not found" });
+      return res
+        .status(403)
+        .json({ status: "Fail", message: "user not found" });
     }
     const deleteUser = await User.findByIdAndDelete(userId);
     res.status(200).json({

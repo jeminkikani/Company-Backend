@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 module.exports.validator = {
-  FIRSTNAME: Joi.string()
+    FIRSTNAME: Joi.string()
     .trim()
     .min(1)
     .max(50)
@@ -22,7 +22,7 @@ module.exports.validator = {
     }),
 
   EMAIL: Joi.string().trim().email().required().messages({
-    "string.email": "Invalid email format",
+    "string.email": "email is not allowed",
   }),
 
   PASSWORD: Joi.string().trim().min(4).required().messages({

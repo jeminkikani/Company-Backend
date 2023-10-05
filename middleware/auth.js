@@ -51,7 +51,7 @@ const IsVerify = (actionRole) => async (req, res, next) => {
     } catch (error) {
       return res.status(403).json({
         status: "Fail",
-        message: "Token is error",
+        message: "Token is Invalid",
       });
     }
   });

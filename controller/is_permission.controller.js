@@ -66,3 +66,61 @@ exports.permission = async (req, res) => {
     });
   }
 };
+
+exports.listpermission = async (req,res) => {
+
+  try {
+  const listdata = await ispermission.find();
+  if (!listdata) {
+    return res.status(404).json({
+      status: "Fail",
+      message: "permission is not create for user",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "user permission Fetch successfully",
+    data: listdata,
+  });
+    
+  } catch (error) {
+    res.status(404).json({
+      status: "Fail",
+      message: "something went wrong",
+      data: error.message,
+  });
+  }
+
+}
+
+/* // view-group
+exports.viewGroup = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "Fail", message: "user is not found" });
+    }
+
+    const group = await Group.find({ company_id: user.company_id });
+    if (!group) {
+      return res
+        .status(404)
+        .json({ status: "Fail", message: "group id is not found" });
+    }
+
+    res.status(201).json({
+      status: "success",
+      message: "user Fetch successfully",
+      data: group,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "Fail",
+      message: "something went wrong",
+      data: error.message,
+    });
+  }
+}; */

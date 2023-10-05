@@ -16,7 +16,7 @@ const userRoutes = express.Router();
 userRoutes.post("/usersignup", validationConstant("register"), registerUser);
 
 // login_user
-userRoutes.post("/loginuser", validationConstant("login"), loginuser);
+userRoutes.post("/loginuser", IsVerify("Admin") ,validationConstant("login"), loginuser);
 
 //refreshToken
 userRoutes.post("/refreshtoken", refreshToken);
