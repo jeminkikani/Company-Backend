@@ -39,6 +39,8 @@ exports.registerUser = async (req, res) => {
         company_id: null,
       });
 
+      const user1 = await User.findById(newUser.id).select("-password");
+
       const payload = {
         id: newUser._id,
         firstname: newUser.firstname,
@@ -64,7 +66,7 @@ exports.registerUser = async (req, res) => {
       res.status(201).json({
         status: "success",
         message: "user created successfully",
-        data: newUser,
+        data: user1,
         token: token,
       });
     } else {

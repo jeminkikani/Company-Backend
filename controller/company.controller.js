@@ -135,6 +135,14 @@ exports.update_company = async (req, res) => {
         error: "register_no has not update",
       });
     }
+    // Validate the contact number
+    const contactNo = req.body.contact_no;
+    if (!isValidContactNumber(contactNo)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Contact number must be a 10-digit number",
+      });
+    }
     const updatedCompany = await Company.findByIdAndUpdate(
       companyId,
       { $set: updateData },

@@ -1,9 +1,11 @@
 const Group = require("../models/Group.model");
 const User = require("../models/user.model");
 const Company = require("../models/company.model");
+const mongoose = require("mongoose");
+
 const GroupUser = require("../models/groupUser.model");
 
-//ceategroup
+//create
 exports.createGroup = async (req, res) => {
   try {
     const { Name, description } = req.body;
@@ -24,11 +26,11 @@ exports.createGroup = async (req, res) => {
     }
 
     const isExistUser = await Group.findOne({ Name });
-    // if (isExistUser) {
-    //   return res
-    //     .status(400)
-    //     .json({ status: "Fail", message: "Group Name is already exists." });
-    // }
+    if (isExistUser) {
+      return res
+        .status(400)
+        .json({ status: "Fail", message: "Group Name is already exists." });
+    }
 
     const newGroup = new Group({
       Name,
@@ -48,12 +50,12 @@ exports.createGroup = async (req, res) => {
 
     res
       .status(201)
-      .json({ status: "Success", newGroup, message: "New Group Added." });
+      .json({ status: "Success", message: "New Group Added", newGroup });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ status: "Fail", message: "Internal Server Error" });
   }
-};
+}; 
 
 // view-group
 exports.viewGroup = async (req, res) => {
@@ -90,10 +92,12 @@ exports.viewGroup = async (req, res) => {
 exports.updateGroup = async (req, res) => {
   try {
     const groupid = req.params.id;
-    if (!groupid) {
+    const isExistGroup = await Group.findById(groupid);
+    console.log(isExistGroup);
+    if (!isExistGroup) {
       return res
-        .status(404)
-        .json({ status: "Fail", message: "group is not found" });
+        .status(400)
+        .json({ status: "Fail", message: "Group is not exists." });
     }
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -119,8 +123,8 @@ exports.updateGroup = async (req, res) => {
 
     res.status(200).json({
       status: "Success",
-      data: updateGroup,
       message: "update group successfully",
+      data: updateGroup,
     });
   } catch (error) {
     console.log(error);
@@ -181,7 +185,7 @@ exports.listGroup = async (req, res) => {
   }
 };
 
-// alldata
+// All data 
 exports.alldata = async (req, res) => {
   try {
     const companyId = req.user.company_id;
@@ -194,16 +198,32 @@ exports.alldata = async (req, res) => {
       });
     }
 
-    const groupsWithCompanyData = await Group.aggregate([
+    const user = await User.aggregate([
       {
-        $match: { company_id: companyId },
+        $match: { _id: new mongoose.Types.ObjectId(req.user.id) },
       },
+      { $limit: 1 },
       {
         $lookup: {
           from: "companies",
           localField: "company_id",
           foreignField: "_id",
           as: "company",
+          pipeline: [
+            {
+              $lookup: {
+                from: "groups",
+                localField: "_id",
+                foreignField: "company_id",
+                as: "groups",
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          company: { $arrayElemAt: ["$company", 0] },
         },
       },
       {
@@ -218,49 +238,28 @@ exports.alldata = async (req, res) => {
           "company.updatedAt": 0,
         },
       },
-    ]);
-
-    const groupedData = {};
-    groupsWithCompanyData.forEach((item) => {
-      const companyId = item.company_id;
-      if (!groupedData[companyId]) {
-        groupedData[companyId] = {
-          company: item.company[0],
-          groups: [],
-        };
-      }
-      groupedData[companyId].groups.push({
-        Name: item.Name,
-        description: item.description,
-      });
-    });
-
-    const userInformation = {
-      id: req.user.id,
-      firstname: req.user.firstname,
-      lastname: req.user.lastname,
-      email: req.user.email,
-      role: req.user.role,
-      company_id: req.user.company_id,
-    };
+        {
+    $unset: ["company.groups.createdAt", "company.groups.updatedAt", "company.groups.__v"]
+  }
+  ]);
+    const user1 = user[0] || null;
 
     res.status(200).json({
       status: "Success",
       message: "Company data fetched successfully",
-        userInformation,
-        groupedData,
+      data: user1,
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({
       status: "Fail",
       message: "Something went wrong",
-      data: error.message,
+      data: error,
     });
   }
 };
 
-// using companyid fetch group data  
+// using companyid fetch group data
 exports.fetchiddata = async (req, res) => {
   try {
     // Assuming the company ID is stored in the token
@@ -312,8 +311,6 @@ exports.fetchiddata = async (req, res) => {
     });
   }
 };
-
-
 
 // exports.alldata = async (req, res) => {
 //   try {
