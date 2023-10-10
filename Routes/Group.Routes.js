@@ -13,37 +13,37 @@ const checkPermissionMiddleware = require("../middleware/check.permission");
 const groupRoutes = express.Router();
 
 groupRoutes.post(
-  "/creategroup",
+  "/create",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   createGroup
 );
 
 groupRoutes.get(
-  "/viewgroup",
+  "/view",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   viewGroup
 );
 
 groupRoutes.post(
-  "/updategroup/:id",
+  "/update/:id",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   updateGroup
 );
 
 groupRoutes.delete(
-  "/deletegroup/:id",
+  "/delete/:id",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   deleteGroup
 );
 
-groupRoutes.get("/listgroup", listGroup);
+groupRoutes.get("/list", listGroup);
 
 groupRoutes.get(
-  "/userinformation",
+  "/userInformation",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   alldata

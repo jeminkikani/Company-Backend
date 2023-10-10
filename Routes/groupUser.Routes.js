@@ -5,7 +5,7 @@ const { joinGroup } = require("../controller/groupUser.controller");
 const groupUserRoutes = express.Router();
 
 groupUserRoutes.post(
-  "/join-group/:id",
+  "/joinGroup/:id",
   IsVerify("Admin"),
   checkPermissionMiddleware("createGroup"),
   joinGroup

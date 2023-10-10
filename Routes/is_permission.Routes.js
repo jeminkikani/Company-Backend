@@ -3,9 +3,9 @@ const { permission, listpermission } = require("../controller/is_permission.cont
 
 const is_permissionRoutes = express.Router();
 
-is_permissionRoutes.post("/ispermission/data/insertdata", permission);
+is_permissionRoutes.post("/insertData", permission);
 
 // list permission
-is_permissionRoutes.get("/ispermission/data/listpermission", listpermission);
+is_permissionRoutes.get("/listPermission", listpermission);
 
 module.exports = is_permissionRoutes;

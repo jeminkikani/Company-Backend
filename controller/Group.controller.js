@@ -76,7 +76,7 @@ exports.viewGroup = async (req, res) => {
 
     res.status(201).json({
       status: "success",
-      message: "user Fetch successfully",
+      message: "group Fetch successfully",
       data: group,
     });
   } catch (error) {
@@ -174,7 +174,7 @@ exports.listGroup = async (req, res) => {
     }
     res.status(200).json({
       status: "success",
-      message: "user Fetch successfully",
+      message: "groups Fetch successfully",
       data: groups,
     });
   } catch (error) {

@@ -13,29 +13,29 @@ const { validationConstant } = require("../constant/validate.constant");
 const userRoutes = express.Router();
 
 // register_user
-userRoutes.post("/usersignup", validationConstant("register"), registerUser);
+userRoutes.post("/signup", validationConstant("register"), registerUser);
 
 // login_user
-userRoutes.post("/loginuser", IsVerify("Admin") ,validationConstant("login"), loginuser);
+userRoutes.post("/login", IsVerify("Admin") ,validationConstant("login"), loginuser);
 
 //refreshToken
-userRoutes.post("/refreshtoken", refreshToken);
+userRoutes.post("/refreshToken", refreshToken);
 
 // user_info
-userRoutes.get("/userinfo", IsVerify("Admin"), user_info);
+userRoutes.get("/userInfo", IsVerify("Admin"), user_info);
 
 //list_user
-userRoutes.get("/listuser", listUser);
+userRoutes.get("/list", listUser);
 
 // updateuser
 userRoutes.put(
-  "/updateprofile",
+  "/updateProfile",
   IsVerify("Admin"),
   validationConstant("update"),
   updateuser
 );
 
 //deleteuser
-userRoutes.delete("/deleteuser", IsVerify("Admin"), deleteUser);
+userRoutes.delete("/delete", IsVerify("Admin"), deleteUser);
 
 module.exports = userRoutes;

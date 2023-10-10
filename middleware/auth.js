@@ -7,13 +7,13 @@ const secret = process.env.SECRET_KEY;
 const IsVerify = (actionRole) => async (req, res, next) => {
   const auth = req.headers["authorization"];
   if (!auth) {
-    return res.json(402).json({
+    return res.status(402).json({
       status: "Fail",
       message: "token is not provide",
     });
   }
-
   const token = auth.split(" ")[1];
+
   jwt.verify(token, secret, async (error, userId) => {
     try {
       const tokenData = await Token.findOne({ token, isActive: true });

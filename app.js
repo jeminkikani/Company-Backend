@@ -21,25 +21,10 @@ mongoose
     console.log(err);
   });
 
-//userRoutes
-const userRoutes = require("./Routes/user.Routes");
-app.use("/api/user", userRoutes);
+//Project Routes
+const Routes = require("./Routes");
+app.use('/api', Routes)
 
-// companyRoutes
-const is_permissionRoutes = require("./Routes/is_permission.Routes");
-app.use("/api", is_permissionRoutes);
-
-// companyRoutes
-const companyRoutes = require("./Routes/company.Routes");
-app.use('/api', companyRoutes)
-
-// groupRoutes 
-const groupRoutes = require("./Routes/Group.Routes");
-app.use('/api', groupRoutes)
-
-// groupUserRoutes
-const groupUserRoutes = require("./Routes/groupUser.Routes");
-app.use('/api', groupUserRoutes)
 
 //server started...
 app.listen(port, () => console.log(`http://loacalhost:${port}`));
